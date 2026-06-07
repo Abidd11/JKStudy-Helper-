@@ -1,0 +1,6 @@
+{
+  "name": "JK Study Helper",
+  "description": "Premium educational materials, PDF notes, previous year question papers, guess papers, and study guides for boards & competitive exams like NEET, JEE, JKBOSE, CBSE, and UPSC, complete with a built-in PDF books reader.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
