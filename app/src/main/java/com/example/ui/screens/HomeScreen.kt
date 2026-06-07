@@ -320,7 +320,7 @@ fun CategoryHubTile(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(96.dp)
+            .heightIn(min = 96.dp)
             .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(16.dp))
             .clickable { onCategoryClick(card.code) },
         shape = RoundedCornerShape(16.dp),
@@ -328,7 +328,8 @@ fun CategoryHubTile(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .background(
                     Brush.linearGradient(
                         colors = listOf(card.startColor, card.endColor)
@@ -345,11 +346,12 @@ fun CategoryHubTile(
                     .align(Alignment.BottomEnd)
                     .offset(x = 6.dp, y = 6.dp)
             )
-
+ 
             // Dynamic text descriptors overlay
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .wrapContentHeight()
                     .padding(12.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
@@ -359,7 +361,7 @@ fun CategoryHubTile(
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Black,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(2.dp))
@@ -368,11 +370,13 @@ fun CategoryHubTile(
                         color = Color.White.copy(alpha = 0.82f),
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Medium,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-
+                
+                Spacer(modifier = Modifier.height(8.dp))
+ 
                 Text(
                     text = if (count == 1) "1 Study File" else "$count Study Files",
                     color = Color.White,
@@ -515,7 +519,9 @@ fun LatestMaterialsTray(
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    lineHeight = 14.sp
+                                    lineHeight = 14.sp,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
 

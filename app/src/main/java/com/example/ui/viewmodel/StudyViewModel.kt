@@ -149,7 +149,11 @@ class StudyViewModel(
                 },
                 onAdFailed = { errorMsg ->
                     _isShowingAdLoader.value = false
-                    _adError.value = errorMsg
+                    _adError.value = null // Clear error to keep UI neat
+                    _downloadNotification.value = "Ad unavailable. Downloading directly..."
+                    viewModelScope.launch {
+                        executeDownloadTask(material, onComplete)
+                    }
                 }
             )
         } else {

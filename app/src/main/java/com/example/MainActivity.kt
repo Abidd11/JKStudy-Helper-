@@ -50,8 +50,12 @@ class MainActivity : ComponentActivity() {
         activityRef = java.lang.ref.WeakReference(this)
         enableEdgeToEdge()
 
-        // Initialize Unity Ads SDK with real ad serves
-        com.example.ui.ads.AdManager.initialize(this)
+        // Initialize Unity Ads SDK with real ad serves safely
+        try {
+            com.example.ui.ads.AdManager.initialize(this)
+        } catch (e: Throwable) {
+            android.util.Log.e("MainActivity", "AdManager failed to initialize: ${e.message}", e)
+        }
 
         // 1. Instantiate Core Architecture Components (Local DB, Retrofit Engine, Repository)
         val database = StudyDatabase.getDatabase(this)

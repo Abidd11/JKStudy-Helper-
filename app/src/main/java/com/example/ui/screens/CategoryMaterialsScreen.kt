@@ -88,8 +88,12 @@ fun CategoryMaterialsScreen(
 
     // Match materials according to search text and filters
     val filteredMaterials = remember(materialsState, searchQuery, selectedTypeFilter, categoryCode) {
-        val cacheList = viewModel.getMaterialsFromCache()
-        cacheList.filter { material ->
+        val allMaterials = if (materialsState is com.example.data.repository.StudyState.Success) {
+            (materialsState as com.example.data.repository.StudyState.Success).materials
+        } else {
+            viewModel.getMaterialsFromCache()
+        }
+        allMaterials.filter { material ->
             val matchesCategory = material.matchesCategory(categoryCode)
             val matchesQuery = material.fileName.lowercase().contains(searchQuery.lowercase())
             val matchesFilter = if (selectedTypeFilter == "All") {

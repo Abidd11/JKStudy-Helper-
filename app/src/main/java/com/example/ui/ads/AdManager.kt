@@ -18,26 +18,29 @@ object AdManager {
     fun initialize(context: Context) {
         if (isInitialized) return
         Log.d("AdManager", "Initializing Unity Ads with Game ID: $GAME_ID")
-        
-        UnityAds.initialize(
-            context.applicationContext,
-            GAME_ID,
-            false, // Real ads as requested (false to serve real ads)
-            object : IUnityAdsInitializationListener {
-                override fun onInitializationComplete() {
-                    isInitialized = true
-                    Log.d("AdManager", "Unity Ads initialization completed successfully.")
-                    preloadAd()
-                }
+        try {
+            UnityAds.initialize(
+                context.applicationContext,
+                GAME_ID,
+                false, // Real ads as requested (false to serve real ads)
+                object : IUnityAdsInitializationListener {
+                    override fun onInitializationComplete() {
+                        isInitialized = true
+                        Log.d("AdManager", "Unity Ads initialization completed successfully.")
+                        preloadAd()
+                    }
 
-                override fun onInitializationFailed(
-                    error: UnityAds.UnityAdsInitializationError?,
-                    id: String?
-                ) {
-                    Log.e("AdManager", "Unity Ads failed to initialize: code=$error, msg=$id")
+                    override fun onInitializationFailed(
+                        error: UnityAds.UnityAdsInitializationError?,
+                        id: String?
+                    ) {
+                        Log.e("AdManager", "Unity Ads failed to initialize: code=$error, msg=$id")
+                    }
                 }
-            }
-        )
+            )
+        } catch (e: Throwable) {
+            Log.e("AdManager", "Throwable during UnityAds.initialize: ${e.message}", e)
+        }
     }
 
     fun preloadAd() {
