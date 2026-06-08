@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -86,11 +87,16 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         if (currentRoute in topLevelRoutes) {
-                            NavigationBar(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.fillMaxWidth(),
-                                tonalElevation = 8.dp
-                            ) {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                com.example.ui.ads.UnityBannerAd(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    placementId = "Banner_Android"
+                                )
+                                NavigationBar(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    tonalElevation = 8.dp
+                                ) {
                                 NavigationBarItem(
                                     selected = currentRoute == ROUTE_HOME,
                                     alwaysShowLabel = true,
@@ -241,11 +247,159 @@ class MainActivity : ComponentActivity() {
                                     )
                                 )
                             }
+                            }
                         }
                     }
                 ) { innerPadding ->
                     val isShowingAdLoader by viewModel.isShowingAdLoader.collectAsState()
                     val adError by viewModel.adError.collectAsState()
+                    val showSponsorAd by viewModel.showSponsorAd.collectAsState()
+
+                    if (showSponsorAd != null) {
+                        val timeLeft = androidx.compose.runtime.remember(showSponsorAd) { androidx.compose.runtime.mutableStateOf(10) }
+                        androidx.compose.runtime.LaunchedEffect(showSponsorAd) {
+                            timeLeft.value = 10
+                            while (timeLeft.value > 0) {
+                                kotlinx.coroutines.delay(1000)
+                                timeLeft.value--
+                            }
+                        }
+
+                        AlertDialog(
+                            onDismissRequest = {
+                                viewModel.dismissSponsorAd()
+                            },
+                            title = null,
+                            text = {
+                                Column(
+                                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(130.dp)
+                                            .background(
+                                                androidx.compose.ui.graphics.Brush.linearGradient(
+                                                    colors = listOf(
+                                                        MaterialTheme.colorScheme.primary,
+                                                        MaterialTheme.colorScheme.secondary
+                                                    )
+                                                ),
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                            .padding(16.dp),
+                                        contentAlignment = androidx.compose.ui.Alignment.Center
+                                    ) {
+                                        Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                                            Icon(
+                                                imageVector = Icons.Default.Book,
+                                                contentDescription = null,
+                                                tint = androidx.compose.ui.graphics.Color.White,
+                                                modifier = Modifier.size(36.dp)
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = "JK Study Helper Plus+",
+                                                color = androidx.compose.ui.graphics.Color.White,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 16.sp,
+                                                letterSpacing = 0.5.sp
+                                            )
+                                            Text(
+                                                text = "Premium Live Mock Tests & Chapter Wise Solved PDFs",
+                                                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    Text(
+                                        text = "Please Help Us Keep Learning Free",
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 15.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    Text(
+                                        text = "Watching sponsor ads allows us to cover host servers and coordinate high-quality materials with educators. Review will finish in:",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                        lineHeight = 15.sp
+                                    )
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    Box(
+                                        contentAlignment = androidx.compose.ui.Alignment.Center,
+                                        modifier = Modifier.size(72.dp)
+                                    ) {
+                                        CircularProgressIndicator(
+                                            progress = { timeLeft.value / 10f },
+                                            modifier = Modifier.fillMaxSize(),
+                                            strokeWidth = 5.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            trackColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                                        )
+                                        if (timeLeft.value > 0) {
+                                            Text(
+                                                text = "${timeLeft.value}",
+                                                fontWeight = FontWeight.Black,
+                                                fontSize = 18.sp,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = Icons.Default.FolderSpecial,
+                                                contentDescription = "Done",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(28.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                Button(
+                                    enabled = timeLeft.value == 0,
+                                    onClick = {
+                                        viewModel.completeSponsorAd()
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text(
+                                        text = if (timeLeft.value > 0) "Seconds Remaining..." else "Unlock Material",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 13.sp
+                                    )
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = { viewModel.dismissSponsorAd() },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        "Cancel Download",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            },
+                            properties = androidx.compose.ui.window.DialogProperties(
+                                dismissOnBackPress = false,
+                                dismissOnClickOutside = false
+                            )
+                        )
+                    }
 
                     if (isShowingAdLoader) {
                         AlertDialog(
@@ -331,6 +485,7 @@ class MainActivity : ComponentActivity() {
                         // Startup Splash Screen
                         composable(ROUTE_SPLASH) {
                             SplashScreen(
+                                viewModel = viewModel,
                                 onNavigateToHome = {
                                     navController.navigate(ROUTE_HOME) {
                                         popUpTo(ROUTE_SPLASH) { inclusive = true }

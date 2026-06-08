@@ -81,8 +81,30 @@ class StudyViewModel(
     private val _adError = MutableStateFlow<String?>(null)
     val adError: StateFlow<String?> = _adError.asStateFlow()
 
+    private val _showSponsorAd = MutableStateFlow<StudyMaterial?>(null)
+    val showSponsorAd: StateFlow<StudyMaterial?> = _showSponsorAd.asStateFlow()
+
+    private var pendingDownloadCompleteCallback: ((com.example.data.local.DownloadEntity) -> Unit)? = null
+
     fun clearAdError() {
         _adError.value = null
+    }
+
+    fun dismissSponsorAd() {
+        _showSponsorAd.value = null
+        pendingDownloadCompleteCallback = null
+    }
+
+    fun completeSponsorAd() {
+        val material = _showSponsorAd.value
+        val callback = pendingDownloadCompleteCallback
+        _showSponsorAd.value = null
+        pendingDownloadCompleteCallback = null
+        if (material != null && callback != null) {
+            viewModelScope.launch {
+                executeDownloadTask(material, callback)
+            }
+        }
     }
 
     // Server health indicator
@@ -149,17 +171,15 @@ class StudyViewModel(
                 },
                 onAdFailed = { errorMsg ->
                     _isShowingAdLoader.value = false
-                    _adError.value = null // Clear error to keep UI neat
-                    _downloadNotification.value = "Ad unavailable. Downloading directly..."
-                    viewModelScope.launch {
-                        executeDownloadTask(material, onComplete)
-                    }
+                    // Fall back cleanly to high-fidelity Sponsor Ad when local real Unity ad fails to load!
+                    android.util.Log.w("StudyViewModel", "Real Ad Failed: $errorMsg. Falling back to Sponsor Ad.")
+                    pendingDownloadCompleteCallback = onComplete
+                    _showSponsorAd.value = material
                 }
             )
         } else {
-            viewModelScope.launch {
-                executeDownloadTask(material, onComplete)
-            }
+            pendingDownloadCompleteCallback = onComplete
+            _showSponsorAd.value = material
         }
     }
 
@@ -266,6 +286,76 @@ class StudyViewModel(
         "\"Every accomplishment starts with the decision to try.\"",
         "\"Success is not final, failure is not fatal: it is the courage to continue that counts.\""
     )
+
+    // Maintenance / App update check engine state
+    private val _updateState = MutableStateFlow<UpdateCheckState>(UpdateCheckState.Idle)
+    val updateState: StateFlow<UpdateCheckState> = _updateState.asStateFlow()
+
+    fun checkForUpdates() {
+        _updateState.value = UpdateCheckState.Checking
+        viewModelScope.launch {
+            try {
+                // Fetch from user-provided official board config URL with strict timeout
+                val response = kotlinx.coroutines.withTimeoutOrNull(1500) {
+                    val configUrl = "https://raw.githubusercontent.com/Abidd11/Jkbose/refs/heads/main/JkStudyhelper.html"
+                    repository.getAppConfig(configUrl)
+                }
+                if (response != null && response.isNotEmpty()) {
+                    val config = response[0]
+                    if (config.maintenance == "true" || config.maintenance == "true\n") {
+                        _updateState.value = UpdateCheckState.Maintenance(config.maintenanceMsg)
+                    } else {
+                        val currentAppVersion = "1.0" // Matches versionName in build.gradle.kts
+                        if (currentAppVersion == config.version) {
+                            _updateState.value = UpdateCheckState.UpToDate
+                        } else {
+                            _updateState.value = UpdateCheckState.UpdateAvailable(
+                                msg = config.updateMsg,
+                                link = config.link
+                            )
+                        }
+                    }
+                } else {
+                    _updateState.value = UpdateCheckState.UpToDate
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("StudyViewModel", "Check update failed or timed out: ${e.message}", e)
+                // Fallback gracefully so we do not block user startup when offline/no connection
+                _updateState.value = UpdateCheckState.UpToDate
+            }
+        }
+    }
+
+    // Trigger Interstitial Video Ad before navigation or other options
+    fun triggerInterstitial(onComplete: () -> Unit) {
+        val currentActivity = com.example.MainActivity.getActivity()
+        if (currentActivity != null) {
+            _isShowingAdLoader.value = true
+            _adError.value = null
+            com.example.ui.ads.AdManager.showInterstitialAd(
+                currentActivity,
+                onAdComplete = {
+                    _isShowingAdLoader.value = false
+                    onComplete()
+                },
+                onAdFailed = { errorMsg ->
+                    _isShowingAdLoader.value = false
+                    android.util.Log.d("StudyViewModel", "Interstitial unavailable: $errorMsg. Continuing...")
+                    onComplete() // fallback so we never block users
+                }
+            )
+        } else {
+            onComplete()
+        }
+    }
+}
+
+sealed interface UpdateCheckState {
+    object Idle : UpdateCheckState
+    object Checking : UpdateCheckState
+    data class Maintenance(val msg: String) : UpdateCheckState
+    data class UpdateAvailable(val msg: String, val link: String) : UpdateCheckState
+    object UpToDate : UpdateCheckState
 }
 
 data class CurrentAffairItem(

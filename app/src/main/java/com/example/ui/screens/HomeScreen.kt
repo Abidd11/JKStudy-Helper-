@@ -63,14 +63,14 @@ fun HomeScreen(
             HeaderWelcomeSection(isServerOnline, materials.size, onMyDownloadsClick)
         }
 
+        // Motivational Quote Card directly on top
+        item {
+            QuoteCard(viewModel.dailyMotivationalQuote)
+        }
+
         // Horizontal Tray: Latest Materials Section on Top of other controls!
         item {
             LatestMaterialsTray(latestMaterials, onMaterialClick)
-        }
-
-        // Motivational Quote Card
-        item {
-            QuoteCard(viewModel.dailyMotivationalQuote)
         }
 
         // Beautiful, organized Categories Hub Section
@@ -101,13 +101,13 @@ fun HeaderWelcomeSection(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
                         Color.Transparent
                     )
                 )
             )
-            .padding(16.dp)
-            .padding(top = 16.dp)
+            .padding(18.dp)
+            .padding(top = 24.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -117,37 +117,58 @@ fun HeaderWelcomeSection(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "JK Study Helper",
-                    fontSize = 24.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    letterSpacing = (-0.5).sp
                 )
+                Spacer(modifier = Modifier.height(2.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(
+                                color = if (isServerOnline) Color(0xFF4CAF50) else Color(0xFFFF9800),
+                                shape = CircleShape
+                            )
+                    )
+                    Text(
+                        text = if (isServerOnline) "All systems operational" else "Offline cache active",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    )
+                }
             }
 
             // Total materials label in full Material 3 style badge indicator
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+            ElevatedCard(
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 ),
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                shape = RoundedCornerShape(14.dp),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 3.dp),
+                modifier = Modifier.clickable { onMyDownloadsClick() }
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Book,
-                        contentDescription = "Total Library",
+                        imageVector = Icons.Default.Folder,
+                        contentDescription = "My Downloads Library",
                         modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "$totalCount Files",
+                        text = "Library",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -162,16 +183,31 @@ fun SlidingBannerView(
     currentIndex: Int,
     onIndicatorClick: (Int) -> Unit
 ) {
-    Card(
+    val gradientBrush = remember(activeBanner) {
+        val startColor = activeBanner.bgColor
+        val endColor = when {
+            activeBanner.bgColor == Color(0xFFF57C00) -> Color(0xFFFF3D00)
+            activeBanner.bgColor == Color(0xFF1565C0) -> Color(0xFF0D47A1)
+            activeBanner.bgColor == Color(0xFF6A1B9A) -> Color(0xFF4A148C)
+            else -> activeBanner.bgColor.copy(alpha = 0.8f)
+        }
+        Brush.horizontalGradient(listOf(startColor, endColor))
+    }
+
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(130.dp)
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(16.dp)),
+            .padding(horizontal = 16.dp, vertical = 6.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = activeBanner.bgColor)
+        colors = CardDefaults.elevatedCardColors(containerColor = activeBanner.bgColor),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(gradientBrush)
+        ) {
             // Content
             Column(
                 modifier = Modifier
@@ -317,71 +353,94 @@ fun CategoryHubTile(
         materials.count { it.matchesCategory(card.code) }
     }
 
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 96.dp)
-            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(16.dp))
+            .heightIn(min = 105.dp)
             .clickable { onCategoryClick(card.code) },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(card.startColor, card.endColor)
-                    )
-                )
+                .padding(14.dp)
         ) {
-            // High transparency background vector symbol (Category cover image)
-            Icon(
-                imageVector = card.icon,
-                contentDescription = null,
-                tint = Color.White.copy(alpha = 0.16f),
-                modifier = Modifier
-                    .size(64.dp)
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 6.dp, y = 6.dp)
-            )
- 
-            // Dynamic text descriptors overlay
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+            // Header Row: Tinted Icon circular container & Custom Files Badge
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = card.title,
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = card.description,
-                        color = Color.White.copy(alpha = 0.82f),
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            color = card.startColor.copy(alpha = 0.12f),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = card.icon,
+                        contentDescription = null,
+                        tint = card.startColor,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(8.dp))
- 
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = card.startColor.copy(alpha = 0.08f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = if (count == 1) "1 File" else "$count Files",
+                        color = card.startColor,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Body Context: Bold Title & Medium Description
+            Text(
+                text = card.title,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = if (count == 1) "1 Study File" else "$count Study Files",
-                    color = Color.White,
+                    text = card.description,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
                     fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = card.startColor.copy(alpha = 0.6f),
+                    modifier = Modifier.size(14.dp)
                 )
             }
         }
@@ -482,14 +541,14 @@ fun LatestMaterialsTray(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(items) { material ->
-                    Card(
+                    ElevatedCard(
                         modifier = Modifier
                             .width(165.dp)
-                            .heightIn(min = 145.dp)
+                            .height(160.dp)
                             .clickable { onMaterialClick(material) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
                             modifier = Modifier
@@ -498,28 +557,40 @@ fun LatestMaterialsTray(
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                            shape = RoundedCornerShape(6.dp)
-                                        )
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = material.inferMaterialTypeString(),
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                                                shape = RoundedCornerShape(6.dp)
+                                            )
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = material.inferMaterialTypeString(),
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    Icon(
+                                        imageVector = Icons.Default.InsertDriveFile,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                                        modifier = Modifier.size(14.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = material.fileName,
                                     fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Black,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    lineHeight = 14.sp,
+                                    lineHeight = 15.sp,
                                     maxLines = 3,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -530,15 +601,26 @@ fun LatestMaterialsTray(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "${material.fileSize} MB",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Folder,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                        modifier = Modifier.size(9.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                    Text(
+                                        text = "${material.fileSize} MB",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+                                    )
+                                }
                                 Text(
                                     text = material.dateString,
                                     fontSize = 9.sp,
-                                    color = Color.Gray
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                 )
                             }
                         }
@@ -585,66 +667,87 @@ fun TrendingSection(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items.take(5).forEachIndexed { index, material ->
-                    Row(
+                    val rankBg = when (index) {
+                        0 -> Color(0xFFFFD700).copy(alpha = 0.15f) // Gold
+                        1 -> Color(0xFFC0C0C0).copy(alpha = 0.2f)  // Silver
+                        2 -> Color(0xFFCD7F32).copy(alpha = 0.18f) // Bronze
+                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.06f)
+                    }
+                    val rankTextColor = when (index) {
+                        0 -> Color(0xFFB8860B) // Darker gold
+                        1 -> Color(0xFF506070) // Slate metallic
+                        2 -> Color(0xFF8B4513) // Bronze brown
+                        else -> MaterialTheme.colorScheme.primary
+                    }
+
+                    ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .clickable { onMaterialClick(material) }
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .clickable { onMaterialClick(material) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.elevatedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
                     ) {
-                        // Position index marker circle
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .size(28.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "${index + 1}",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = material.fileName,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Position index marker circle
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(
+                                        color = rankBg,
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Text(
-                                    text = material.inferCategoryString(),
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "•  ${material.fileSize} MB",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
+                                    text = "${index + 1}",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = rankTextColor
                                 )
                             }
-                        }
 
-                        Icon(
-                            Icons.Default.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = Color.Gray
-                        )
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = material.fileName,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = material.inferCategoryString(),
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "•  ${material.fileSize} MB",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    )
+                                }
+                            }
+
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -661,17 +764,21 @@ fun StudyMaterialRowItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f),
+                shape = RoundedCornerShape(12.dp)
+            )
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(12.dp)
             )
-            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            Icons.Default.InsertDriveFile,
+            imageVector = Icons.Default.InsertDriveFile,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
@@ -696,11 +803,17 @@ fun StudyMaterialRowItem(
                 Text(
                     text = "${material.fileSize} MB",
                     fontSize = 10.sp,
-                    color = Color.Gray
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier.size(16.dp)
+        )
     }
 }
 

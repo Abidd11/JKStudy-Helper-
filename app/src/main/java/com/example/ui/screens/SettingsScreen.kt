@@ -37,6 +37,7 @@ fun SettingsScreen(
     val isServerOnline by viewModel.isServerOnline.collectAsState()
     val downloads by viewModel.downloads.collectAsState()
     val requests by viewModel.materialRequests.collectAsState()
+    val updateState by viewModel.updateState.collectAsState()
 
     var showDisclaimerDialog by remember { mutableStateOf(false) }
 
@@ -63,7 +64,7 @@ fun SettingsScreen(
                         tint = MaterialTheme.colorScheme.error
                     )
                     Text(
-                        text = "Official Disclaimer",
+                        text = "Disclaimer",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -71,7 +72,17 @@ fun SettingsScreen(
             },
             text = {
                 Text(
-                    text = "JK Study Helper is a dedicated community-driven initiative. All study materials, resources, syllabus papers, and notes compiled or shared dynamically within this application are exclusively sourced from public domains, volunteer students, and educators for academic reference goals.\n\nThis application is NOT affiliated with, authorized, or officially endorsed by the Jammu and Kashmir Board of School Education (JKBOSE), Central Board of Secondary Education (CBSE), or any federal, state, or municipal government entity.\n\nFor official and legally verified state-level announcements and publications, students are advised to refer directly to the official portals (e.g., jkbose.nic.in).",
+                    text = "This application is designed for educational purposes only.\n" +
+                            "It serves as a tool to collect, organize, and provide access to publicly available study materials, results, syllabi, and educational resources from official websites and verified online sources.\n\n" +
+                            "The app does not host or own any of the educational content shown.\n" +
+                            "All links, PDFs, and materials are sourced from official public websites and are shared solely to help students easily access information in one place.\n\n" +
+                            "All content such as PDFs, notices, datesheets, and study materials shown in this app are gathered from publicly available sources \n\n" +
+                            "User-submitted materials \n" +
+                            "We do not represent, affiliate with, or claim any endorsement from any educational board, institution, or government body.\n" +
+                            "All trademarks and materials belong to their respective owners.\n\n" +
+                            "While we make every effort to ensure that the information provided is accurate and up-to-date, we make no guarantees about the completeness, reliability, or accuracy of the data.\n" +
+                            "Users are encouraged to verify details from official sources before taking any decision.\n\n" +
+                            "By using this app, you agree that the developer is not responsible for any errors, omissions, or outcomes resulting from the use of this information",
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -91,13 +102,13 @@ fun SettingsScreen(
                 title = {
                     Text(
                         "Help & Settings",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -112,30 +123,31 @@ fun SettingsScreen(
         ) {
             // App Identity & Header Status Card
             item {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Box(
                             modifier = Modifier
                                 .size(64.dp)
-                                .background(MaterialTheme.colorScheme.primaryContainer, shape = CircleShape),
+                                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f), shape = CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.School,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(36.dp)
+                                modifier = Modifier.size(32.dp)
                             )
                         }
 
@@ -149,15 +161,15 @@ fun SettingsScreen(
                         )
 
                         Text(
-                            text = "Version 2.4.0 (Stable M3)",
+                            text = "Version 2.4.0 (Stable M3 Edge)",
                             fontSize = 11.sp,
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium
+                            color = MaterialTheme.colorScheme.outline,
+                            fontWeight = FontWeight.Bold
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -189,6 +201,8 @@ fun SettingsScreen(
 
             // Developer About section
             item {
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
                     text = "DEVELOPER ABOUT",
                     fontSize = 11.sp,
@@ -198,26 +212,41 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                 )
 
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Code, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Rather Abid",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                    ListItem(
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        leadingContent = {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), shape = CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Code,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
                                 )
+                            }
+                        },
+                        headlineContent = {
+                            Text(
+                                text = "Rather Abid",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        supportingContent = {
+                            Column {
                                 Text(
                                     text = "Lead Developer",
                                     fontSize = 10.sp,
@@ -228,12 +257,12 @@ fun SettingsScreen(
                                 Text(
                                     text = "Developed with ❤️ in Jammu & Kashmir for Board & Competitive Students.",
                                     fontSize = 11.sp,
-                                    color = Color.Gray,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     lineHeight = 15.sp
                                 )
                             }
                         }
-                    }
+                    )
                 }
             }
 
@@ -255,11 +284,11 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     SocialRowItem(
-                        title = "Join Telegram Channel",
-                        description = "Instant notifications on JKBOSE Notifications & PDFs",
-                        icon = Icons.Default.Send,
-                        tintColor = Color(0xFF24A1DE),
-                        onClick = { openUrl("https://telegram.me/jkstudyhelper") }
+                        title = "Join WhatsApp Channel",
+                        description = "Instant notifications, papers, study material & notes",
+                        icon = Icons.Default.Campaign,
+                        tintColor = Color(0xFF25D366),
+                        onClick = { openUrl("https://whatsapp.com/channel/0029VajKhZ0JENy2l6mBt817") }
                     )
 
                     SocialRowItem(
@@ -267,7 +296,7 @@ fun SettingsScreen(
                         description = "Daily current affairs, MIQs & Board updates",
                         icon = Icons.Default.CameraAlt,
                         tintColor = Color(0xFFE1306C),
-                        onClick = { openUrl("https://instagram.com/jkstudyhelper") }
+                        onClick = { openUrl("https://www.instagram.com/ohh_itz__a._.bid__") }
                     )
 
                     SocialRowItem(
@@ -293,28 +322,22 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                 )
 
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
                         .clickable { onOpenSupportClick() },
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    ListItem(
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        leadingContent = {
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), shape = CircleShape),
+                                    .size(40.dp)
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), shape = CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -324,27 +347,98 @@ fun SettingsScreen(
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Submit study notes request",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "Have custom demands? Ask desk directly.",
-                                    fontSize = 11.sp,
-                                    color = Color.Gray
+                        },
+                        headlineContent = {
+                            Text(
+                                text = "Submit Study Notes Request",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Have custom demands? Ask desk directly.",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.ChevronRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    )
+                }
+            }
+
+            // Stability Manual Update Check Block
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "SYSTEM RELIABILITY & DIAGNOSTICS",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.primary,
+                    letterSpacing = 1.sp,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                )
+
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .clickable {
+                            Toast.makeText(context, "Checking server for updates...", Toast.LENGTH_SHORT).show()
+                            viewModel.checkForUpdates()
+                        },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                ) {
+                    ListItem(
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        leadingContent = {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f), shape = CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.SystemUpdate,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
+                        },
+                        headlineContent = {
+                            Text(
+                                text = "Inspect and Check for Updates",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Query active GitHub branch config immediately",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
                         }
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    )
                 }
             }
 
@@ -361,28 +455,22 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                 )
 
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
                         .clickable { showDisclaimerDialog = true },
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    ListItem(
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        leadingContent = {
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .background(MaterialTheme.colorScheme.error.copy(alpha = 0.1f), shape = CircleShape),
+                                    .size(40.dp)
+                                    .background(MaterialTheme.colorScheme.error.copy(alpha = 0.12f), shape = CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -392,27 +480,30 @@ fun SettingsScreen(
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "App Affiliation & Disclaimer",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "Official JKBOSE/CBSE Non-Affiliation advisory.",
-                                    fontSize = 11.sp,
-                                    color = Color.Gray
-                                )
-                            }
+                        },
+                        headlineContent = {
+                            Text(
+                                text = "App Disclaimer",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Official educational resources disclaimer.",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.ChevronRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
                         }
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = Color.Gray.copy(alpha = 0.8f)
-                        )
-                    }
+                    )
                 }
             }
 
@@ -420,7 +511,7 @@ fun SettingsScreen(
             item {
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -428,10 +519,11 @@ fun SettingsScreen(
                             viewModel.refresh()
                             Toast.makeText(context, "Initiating global database sync...", Toast.LENGTH_SHORT).show()
                         },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                    )
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                    ),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -458,6 +550,22 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+// Inline helper for cleanly nesting Column details inside card
+@Composable
+fun NoblesRequestRowDetails() {
+    Text(
+        text = "Submit study notes request",
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+    Text(
+        text = "Have custom demands? Ask desk directly.",
+        fontSize = 11.sp,
+        color = MaterialTheme.colorScheme.outline
+    )
 }
 
 @Composable

@@ -191,6 +191,12 @@ fun PdfReaderScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                 )
             )
+        },
+        bottomBar = {
+            com.example.ui.ads.UnityBannerAd(
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                placementId = "Banner_Android"
+            )
         }
     ) { innerPadding ->
         Box(

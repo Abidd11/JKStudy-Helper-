@@ -42,54 +42,105 @@ fun SearchScreen(
 
     var queryText by remember { mutableStateOf("") }
     val recentSearches = listOf("Physics", "Syllabus", "JKBOSE 10th", "NEET practice")
+    val filterTypes = remember { listOf("All", "Notes", "Papers", "Practicals", "Syllabus") }
+    var selectedTypeFilter by remember { mutableStateOf("All") }
+    var showFilters by remember { mutableStateOf(false) }
 
-    val results = remember(queryText, allMaterials) {
+    val results = remember(queryText, selectedTypeFilter, allMaterials) {
         if (queryText.trim().isEmpty()) {
             emptyList()
         } else {
             allMaterials.filter {
-                it.fileName.lowercase().contains(queryText.lowercase()) ||
-                it.inferMaterialTypeString().lowercase().contains(queryText.lowercase()) ||
-                it.fileId.lowercase().contains(queryText.lowercase())
+                val matchesQuery = it.fileName.lowercase().contains(queryText.lowercase()) ||
+                        it.inferMaterialTypeString().lowercase().contains(queryText.lowercase()) ||
+                        it.fileId.lowercase().contains(queryText.lowercase())
+                val matchesType = when (selectedTypeFilter) {
+                    "Notes" -> it.inferMaterialTypeString().lowercase().contains("notes")
+                    "Papers" -> it.inferMaterialTypeString().lowercase().contains("paper")
+                    "Practicals" -> it.inferMaterialTypeString().lowercase().contains("practical") || it.inferMaterialTypeString().lowercase().contains("guide")
+                    "Syllabus" -> it.inferMaterialTypeString().lowercase().contains("syllabus")
+                    else -> true
+                }
+                matchesQuery && matchesType
             }
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 0.dp,
+                shadowElevation = 0.dp
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     TextField(
                         value = queryText,
                         onValueChange = { queryText = it },
-                        placeholder = { Text("Search files, papers, notes or subjects...", fontSize = 13.sp) },
+                        placeholder = { Text("Search files, papers, notes or subjects...", fontSize = 14.sp) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(end = 8.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                            .height(54.dp)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(27.dp)
+                            ),
+                        shape = RoundedCornerShape(27.dp),
+                        leadingIcon = { 
+                            Icon(
+                                imageVector = Icons.Default.Search, 
+                                contentDescription = null, 
+                                modifier = Modifier.size(22.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            ) 
+                        },
                         trailingIcon = {
-                            if (queryText.isNotEmpty()) {
-                                IconButton(onClick = { queryText = "" }) {
-                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Row(
+                                modifier = Modifier.padding(end = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (queryText.isNotEmpty()) {
+                                    IconButton(
+                                        onClick = { queryText = "" },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                                IconButton(
+                                    onClick = { showFilters = !showFilters },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.FilterList,
+                                        contentDescription = "Toggle Filters",
+                                        tint = if (selectedTypeFilter != "All") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(22.dp)
+                                    )
                                 }
                             }
                         },
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent
+                            disabledIndicatorColor = Color.Transparent,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         singleLine = true,
-                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp)
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 14.sp)
                     )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -98,6 +149,42 @@ fun SearchScreen(
                 .padding(padding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
+            // Elegant slide-down filter chips block
+            AnimatedVisibility(
+                visible = showFilters,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "FILTER SEARCH BY",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary,
+                        letterSpacing = 0.5.sp,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(filterTypes) { type ->
+                            val isSelected = selectedTypeFilter == type
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { selectedTypeFilter = type },
+                                label = { Text(type, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) }
+                            )
+                        }
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(top = 10.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                }
+            }
 
             AnimatedVisibility(visible = queryText.trim().isEmpty()) {
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {

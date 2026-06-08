@@ -106,8 +106,10 @@ fun MyDownloadsScreen(
                                 DownloadFileRow(
                                     download = download,
                                     onOpen = {
-                                        viewModel.trackRecentView(download.fileId)
-                                        onOpenPdfReader(download.fileId)
+                                        viewModel.triggerInterstitial {
+                                            viewModel.trackRecentView(download.fileId)
+                                            onOpenPdfReader(download.fileId)
+                                        }
                                     },
                                     onShare = {
                                         // Standard Sharing Action
@@ -157,8 +159,10 @@ fun MyDownloadsScreen(
                                         )
                                         .clickable {
                                             if (isDownloaded) {
-                                                viewModel.trackRecentView(material.fileId)
-                                                onOpenPdfReader(material.fileId)
+                                                viewModel.triggerInterstitial {
+                                                    viewModel.trackRecentView(material.fileId)
+                                                    onOpenPdfReader(material.fileId)
+                                                }
                                             } else {
                                                 // Trigger fast downloads
                                                 viewModel.triggerDownload(material) {

@@ -48,6 +48,12 @@ class StudyRepository(
 
     fun getMaterialsFromCache(): List<StudyMaterial> = inMemoryCache
 
+    suspend fun getAppConfig(url: String): List<com.example.data.remote.AppUpdateConfig> {
+        return withContext(Dispatchers.IO) {
+            apiService.getAppConfig(url)
+        }
+    }
+
     // Downloads Room Queries
     val allDownloads: Flow<List<DownloadEntity>> = downloadDao.getAllDownloads()
 
