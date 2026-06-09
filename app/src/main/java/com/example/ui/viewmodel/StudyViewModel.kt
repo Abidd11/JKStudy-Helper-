@@ -183,6 +183,30 @@ class StudyViewModel(
         }
     }
 
+    // Interactive Reward Ad player triggered on clicking downloaded files to satisfy 'reward ads every click'
+    fun triggerAdForOpening(material: StudyMaterial, onComplete: () -> Unit) {
+        val currentActivity = com.example.MainActivity.getActivity()
+        if (currentActivity != null) {
+            _isShowingAdLoader.value = true
+            _adError.value = null
+            com.example.ui.ads.AdManager.showAd(
+                currentActivity,
+                onAdComplete = {
+                    _isShowingAdLoader.value = false
+                    onComplete()
+                },
+                onAdFailed = { errorMsg ->
+                    _isShowingAdLoader.value = false
+                    android.util.Log.w("StudyViewModel", "Real Opening Ad Failed: $errorMsg. Falling back to normal open.")
+                    // Graceful fallback to Interstitial is handled in AdManager or direct callback here
+                    onComplete()
+                }
+            )
+        } else {
+            onComplete()
+        }
+    }
+
     private suspend fun executeDownloadTask(
         material: StudyMaterial,
         onComplete: (com.example.data.local.DownloadEntity) -> Unit

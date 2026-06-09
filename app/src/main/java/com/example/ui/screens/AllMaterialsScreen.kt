@@ -231,6 +231,12 @@ fun AllMaterialsScreen(
     }
 
     Scaffold(
+        bottomBar = {
+            com.example.ui.ads.UnityBannerAd(
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                placementId = "Banner_Android"
+            )
+        },
         topBar = {
             TopAppBar(
                 title = {

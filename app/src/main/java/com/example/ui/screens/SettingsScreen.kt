@@ -349,50 +349,170 @@ fun SettingsScreen(
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
                 ) {
-                    ListItem(
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        leadingContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Glowing golden/rainbow border on developer's vector avatar
+                        Box(
+                            modifier = Modifier
+                                .size(96.dp)
+                                .background(
+                                    brush = androidx.compose.ui.graphics.Brush.sweepGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.colorScheme.secondary,
+                                            Color(0xFFF1C40F),
+                                            MaterialTheme.colorScheme.primary
+                                        )
+                                    ),
+                                    shape = CircleShape
+                                )
+                                .padding(3.dp)
+                                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                                .padding(3.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Image(
                                 painter = painterResource(id = R.drawable.img_developer_avatar),
-                                contentDescription = "Aabid's avatar portrait",
+                                contentDescription = "Aabid's profile avatar",
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .fillMaxSize()
                                     .clip(CircleShape),
                                 contentScale = ContentScale.Crop
                             )
-                        },
-                        headlineContent = {
-                            Text(
-                                text = "Aabid",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                        supportingContent = {
-                            Column {
-                                Text(
-                                    text = "Lead Developer",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.SemiBold
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "Aabid",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        // Creator Badge
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = Color(0xFFE8F5E9),
+                                    shape = RoundedCornerShape(8.dp)
                                 )
-                                Spacer(modifier = Modifier.height(6.dp))
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "VERIFIED CREATOR & LEAD DEVELOPER 🌟",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color(0xFF2E7D32)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Cool stylized quote message box
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                                .padding(16.dp)
+                        ) {
+                            Column {
+                                Icon(
+                                    imageVector = Icons.Default.FormatQuote,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                                    modifier = Modifier.size(24.dp)
+                                )
                                 Text(
-                                    text = "Hey there,\nI’m Aabid, from the heart of Kashmir.\nWith whatever little knowledge I have, I always strive to create something new — something that can make a difference.\nMy true joy lies in using my ideas to serve the people around me.\nThank you for being here 💞\nWith warmth,\nAabid",
+                                    text = "Hey there! I’m Aabid, from the heart of Kashmir. With whatever little knowledge I have, I always strive to create something new—something that can make a genuine difference in the educational lives of J&K students. My true joy lies in using my tech skills to assist the community. Thank you for your support!",
                                     fontSize = 12.sp,
+                                    lineHeight = 18.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    lineHeight = 16.sp,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Bold,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                                 )
                             }
                         }
-                    )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Connect with Me Instantly",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.primary,
+                            letterSpacing = 1.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Interactive high-fidelity contact action buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = { openUrl("mailto:rathereditzofficial@gmail.com") },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Email", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+
+                            Button(
+                                onClick = { openUrl("https://www.instagram.com/ohh_itz__a._.bid__") },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE1306C)) // Instagram primary brand color
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CameraAlt,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Instagram", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = { openUrl("https://whatsapp.com/channel/0029VajKhZ0JENy2l6mBt817") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)) // WhatsApp brand color
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Forum,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Join WhatsApp Channel", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                        }
+                    }
                 }
             }
 

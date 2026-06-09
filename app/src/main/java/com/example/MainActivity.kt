@@ -512,8 +512,10 @@ class MainActivity : ComponentActivity() {
                                     viewModel.trackRecentView(material.fileId)
                                     val localDownload = viewModel.downloads.value.find { it.fileId == material.fileId }
                                     if (localDownload != null) {
-                                        // Auto-detected locally downloaded card file! Open instantly with ZERO ads!
-                                        navController.navigate("pdf_viewer/${material.fileId}")
+                                        // Play rewarded/interstitial ad on every click before opening already offline materials
+                                        viewModel.triggerAdForOpening(material) {
+                                            navController.navigate("pdf_viewer/${material.fileId}")
+                                        }
                                     } else {
                                         // Not downloaded, trigger premium rewarded download flow
                                         viewModel.triggerDownload(material) {
@@ -540,8 +542,15 @@ class MainActivity : ComponentActivity() {
                                 viewModel = viewModel,
                                 onMaterialClick = { material ->
                                     viewModel.trackRecentView(material.fileId)
-                                    viewModel.triggerDownload(material) {
-                                        navController.navigate("pdf_viewer/${material.fileId}")
+                                    val localDownload = viewModel.downloads.value.find { it.fileId == material.fileId }
+                                    if (localDownload != null) {
+                                        viewModel.triggerAdForOpening(material) {
+                                            navController.navigate("pdf_viewer/${material.fileId}")
+                                        }
+                                    } else {
+                                        viewModel.triggerDownload(material) {
+                                            navController.navigate("pdf_viewer/${material.fileId}")
+                                        }
                                     }
                                 }
                             )
@@ -553,8 +562,15 @@ class MainActivity : ComponentActivity() {
                                 viewModel = viewModel,
                                 onMaterialClick = { material ->
                                     viewModel.trackRecentView(material.fileId)
-                                    viewModel.triggerDownload(material) {
-                                        navController.navigate("pdf_viewer/${material.fileId}")
+                                    val localDownload = viewModel.downloads.value.find { it.fileId == material.fileId }
+                                    if (localDownload != null) {
+                                        viewModel.triggerAdForOpening(material) {
+                                            navController.navigate("pdf_viewer/${material.fileId}")
+                                        }
+                                    } else {
+                                        viewModel.triggerDownload(material) {
+                                            navController.navigate("pdf_viewer/${material.fileId}")
+                                        }
                                     }
                                 }
                             )

@@ -80,6 +80,21 @@ fun HomeScreen(
             )
         }
 
+        // Inline Sponsor Banner between Latest and Categories Hub
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                com.example.ui.ads.UnityBannerAd(
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    placementId = "Banner_Android"
+                )
+            }
+        }
+
         // Beautiful, organized Categories Hub Section
         item {
             StudyCategoriesHub(
@@ -87,6 +102,21 @@ fun HomeScreen(
                 onCategoryClick = onCategoryClick,
                 onSupportClick = onSupportClick
             )
+        }
+
+        // Inline Sponsor Banner between Categories Hub and Trending
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                com.example.ui.ads.UnityBannerAd(
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    placementId = "Banner_Android"
+                )
+            }
         }
 
         // Column: Trending / Most Visited Downloads Section
@@ -543,7 +573,12 @@ fun LatestMaterialsTray(
                         modifier = Modifier
                             .width(170.dp)
                             .height(175.dp)
-                            .clickable { onMaterialClick(material) },
+                            .clickable { onMaterialClick(material) }
+                            .border(
+                                width = 1.dp,
+                                color = if (isDownloaded) Color(0xFF2E7D32).copy(alpha = 0.40f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.elevatedCardColors(
                             containerColor = if (isDownloaded) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface
@@ -701,7 +736,12 @@ fun TrendingSection(
                     ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onMaterialClick(material) },
+                            .clickable { onMaterialClick(material) }
+                            .border(
+                                width = 1.dp,
+                                color = if (isDownloaded) Color(0xFF2E7D32).copy(alpha = 0.40f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(12.dp)
+                            ),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.elevatedCardColors(
                             containerColor = if (isDownloaded) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface

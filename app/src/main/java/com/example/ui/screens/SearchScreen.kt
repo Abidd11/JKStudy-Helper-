@@ -67,6 +67,12 @@ fun SearchScreen(
     }
 
     Scaffold(
+        bottomBar = {
+            com.example.ui.ads.UnityBannerAd(
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                placementId = "Banner_Android"
+            )
+        },
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.background,

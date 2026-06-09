@@ -504,7 +504,7 @@ fun CategoryMaterialsScreen(
                                         isDownloaded -> {
                                             Button(
                                                 onClick = {
-                                                    viewModel.triggerInterstitial {
+                                                    viewModel.triggerAdForOpening(material) {
                                                         // Move into reader & record index view
                                                         viewModel.trackRecentView(material.fileId)
                                                         onOpenPdfReader(material.fileId)
