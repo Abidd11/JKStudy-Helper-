@@ -37,6 +37,24 @@ fun SplashScreen(
     val activity = context as? android.app.Activity
     val updateState by viewModel.updateState.collectAsState()
 
+    val view = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(view) {
+        val window = (view.context as? android.app.Activity)?.window
+        val windowInsetsController = window?.let {
+            androidx.core.view.WindowCompat.getInsetsController(it, view)
+        }
+        
+        // Hide system status and navigation bars during splash for an immersive, premium full bleed look
+        windowInsetsController?.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+        windowInsetsController?.systemBarsBehavior =
+            androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        onDispose {
+            // Restore standard status and navigation bars back as we exit splash
+            windowInsetsController?.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
     var startAnimation by remember { mutableStateOf(false) }
     val scale = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0.85f,

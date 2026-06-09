@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
         activityRef = java.lang.ref.WeakReference(this)
         enableEdgeToEdge()
 
-        // Initialize Unity Ads SDK with real ad serves safely
+        // Initialize Start.io Ads SDK with real ad serves safely
         try {
             com.example.ui.ads.AdManager.initialize(this)
         } catch (e: Throwable) {
@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        if (currentRoute in topLevelRoutes) {
+                        if (currentRoute != null && currentRoute != ROUTE_SPLASH && currentRoute in topLevelRoutes) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 com.example.ui.ads.UnityBannerAd(
                                     modifier = Modifier.fillMaxWidth(),

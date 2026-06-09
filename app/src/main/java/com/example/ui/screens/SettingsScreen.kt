@@ -178,12 +178,6 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
                             StatusIndicatorCol(
-                                title = "Server Sync",
-                                detail = if (isServerOnline) "Connected" else "Cached Mode",
-                                isSuccess = isServerOnline
-                            )
-
-                            StatusIndicatorCol(
                                 title = "Local Files",
                                 detail = "${downloads.size} Files",
                                 isSuccess = downloads.isNotEmpty()
@@ -504,48 +498,6 @@ fun SettingsScreen(
                             )
                         }
                     )
-                }
-            }
-
-            // Sync Refresh Action Card
-            item {
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ElevatedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clickable {
-                            viewModel.refresh()
-                            Toast.makeText(context, "Initiating global database sync...", Toast.LENGTH_SHORT).show()
-                        },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-                    ),
-                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Sync Info",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Refresh Study Files Cache",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
                 }
             }
         }

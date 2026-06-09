@@ -122,26 +122,6 @@ fun HeaderWelcomeSection(
                     color = MaterialTheme.colorScheme.primary,
                     letterSpacing = (-0.5).sp
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                color = if (isServerOnline) Color(0xFF4CAF50) else Color(0xFFFF9800),
-                                shape = CircleShape
-                            )
-                    )
-                    Text(
-                        text = if (isServerOnline) "All systems operational" else "Offline cache active",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                    )
-                }
             }
 
             // Total materials label in full Material 3 style badge indicator

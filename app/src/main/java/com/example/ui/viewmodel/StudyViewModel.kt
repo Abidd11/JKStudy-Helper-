@@ -171,7 +171,7 @@ class StudyViewModel(
                 },
                 onAdFailed = { errorMsg ->
                     _isShowingAdLoader.value = false
-                    // Fall back cleanly to high-fidelity Sponsor Ad when local real Unity ad fails to load!
+                    // Fall back cleanly to high-fidelity Sponsor Ad when local real Start.io ad fails to load!
                     android.util.Log.w("StudyViewModel", "Real Ad Failed: $errorMsg. Falling back to Sponsor Ad.")
                     pendingDownloadCompleteCallback = onComplete
                     _showSponsorAd.value = material
