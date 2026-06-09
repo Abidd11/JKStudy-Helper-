@@ -291,6 +291,65 @@ class StudyViewModel(
     private val _updateState = MutableStateFlow<UpdateCheckState>(UpdateCheckState.Idle)
     val updateState: StateFlow<UpdateCheckState> = _updateState.asStateFlow()
 
+    // Dynamic GitHub-hosted User Manual engine
+    private val _rawManual = MutableStateFlow<String>("")
+    val rawManual: StateFlow<String> = _rawManual.asStateFlow()
+
+    private val _isManualLoading = MutableStateFlow<Boolean>(false)
+    val isManualLoading: StateFlow<Boolean> = _isManualLoading.asStateFlow()
+
+    fun loadAppManual() {
+        _isManualLoading.value = true
+        viewModelScope.launch {
+            val url = "https://raw.githubusercontent.com/Abidd11/Jkbose/refs/heads/main/manual.md"
+            val fallbackDocs = """
+                📌 **JK STUDY HELPER - LIVE MANUAL**
+                
+                Welcome to J&K Study Helper, your premium community platform for boards and competitive examinations offline & online.
+                
+                ---
+                
+                🚀 **ONE CLICK DIRECT DOWNLOADS**
+                - To view any resource, simply click the card or the **"One Click Download"** action button.
+                - We automatically detect if you have already saved the file offline.
+                - If already downloaded, the interactive PDF reader will open **INSTANTLY without any ads or video streams!**
+                
+                ---
+                
+                🎟️ **REWARDED AD BLOCKERS & MAINTENANCE**
+                - To keep high-quality books, syllabi, datesheets, and papers completely free, a short sponsor ad supports our storage costs.
+                - If real video servers have congestion, a fallback sponsor banner allows you to bypass and acquire downloads instantly!
+                
+                ---
+                
+                📬 **SUBMISSION HELP DESK**
+                - Want us to include specific mock tests, JKBOSE guides, or NCERT solution materials?
+                - Navigate to **"Saved -> Submit Requests"** or Settings and submit your custom file demands. We inspect requests daily and push materials live!
+                
+                ---
+                
+                🔗 **GITHUB LIVE SYNC**
+                - This user guide manual compiles dynamically from our cloud repository.
+                - Our community keeps documentation fresh even when new store releases aren't pushed.
+                
+                *Developed with love by Aabid for JKBOSE & JKSSB aspirants.*
+            """.trimIndent()
+
+            try {
+                val downloadedText = repository.fetchRawText(url)
+                if (downloadedText.trim().isNotEmpty()) {
+                    _rawManual.value = downloadedText
+                } else {
+                    _rawManual.value = fallbackDocs
+                }
+            } catch (e: Exception) {
+                _rawManual.value = fallbackDocs
+            } finally {
+                _isManualLoading.value = false
+            }
+        }
+    }
+
     fun checkForUpdates() {
         _updateState.value = UpdateCheckState.Checking
         viewModelScope.launch {

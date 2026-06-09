@@ -85,6 +85,11 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
+                    contentWindowInsets = if (currentRoute == ROUTE_SPLASH) {
+                        androidx.compose.foundation.layout.WindowInsets(0.dp)
+                    } else {
+                        ScaffoldDefaults.contentWindowInsets
+                    },
                     bottomBar = {
                         if (currentRoute != null && currentRoute != ROUTE_SPLASH && currentRoute in topLevelRoutes) {
                             Column(modifier = Modifier.fillMaxWidth()) {
@@ -480,7 +485,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         startDestination = ROUTE_SPLASH,
-                        modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
+                        modifier = Modifier.padding(
+                            bottom = if (currentRoute == ROUTE_SPLASH) 0.dp else innerPadding.calculateBottomPadding()
+                        )
                     ) {
                         // Startup Splash Screen
                         composable(ROUTE_SPLASH) {
@@ -502,11 +509,17 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate("category/$categoryCode")
                                 },
                                 onMaterialClick = { material ->
-                                    val safeCategory = material.inferCategoryString()
-                                        .lowercase()
-                                        .replace(" ", "")
-                                        .trim()
-                                    navController.navigate("category/$safeCategory")
+                                    viewModel.trackRecentView(material.fileId)
+                                    val localDownload = viewModel.downloads.value.find { it.fileId == material.fileId }
+                                    if (localDownload != null) {
+                                        // Auto-detected locally downloaded card file! Open instantly with ZERO ads!
+                                        navController.navigate("pdf_viewer/${material.fileId}")
+                                    } else {
+                                        // Not downloaded, trigger premium rewarded download flow
+                                        viewModel.triggerDownload(material) {
+                                            navController.navigate("pdf_viewer/${material.fileId}")
+                                        }
+                                    }
                                 },
                                 onMyDownloadsClick = {
                                     navController.navigate(ROUTE_MY_DOWNLOADS) {

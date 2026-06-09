@@ -6,7 +6,9 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
@@ -28,6 +30,9 @@ interface StudyApiService {
 
     @GET
     suspend fun getAppConfig(@Url url: String): List<AppUpdateConfig>
+
+    @GET
+    suspend fun getRawText(@Url url: String): Response<ResponseBody>
 
     companion object {
         private const val BASE_URL = "https://script.google.com/"

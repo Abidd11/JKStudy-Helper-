@@ -43,6 +43,8 @@ fun HomeScreen(
     val latestMaterials by viewModel.latestMaterials.collectAsState()
     val trendingMaterials by viewModel.trendingMaterials.collectAsState()
     val isServerOnline by viewModel.isServerOnline.collectAsState()
+    val downloads by viewModel.downloads.collectAsState()
+    val downloadingFileId by viewModel.downloadingFileId.collectAsState()
 
     val materials = remember(materialsState) {
         if (materialsState is StudyState.Success) {
@@ -70,7 +72,12 @@ fun HomeScreen(
 
         // Horizontal Tray: Latest Materials Section on Top of other controls!
         item {
-            LatestMaterialsTray(latestMaterials, onMaterialClick)
+            LatestMaterialsTray(
+                items = latestMaterials,
+                downloads = downloads,
+                downloadingFileId = downloadingFileId,
+                onMaterialClick = onMaterialClick
+            )
         }
 
         // Beautiful, organized Categories Hub Section
@@ -84,7 +91,12 @@ fun HomeScreen(
 
         // Column: Trending / Most Visited Downloads Section
         item {
-            TrendingSection(trendingMaterials, onMaterialClick)
+            TrendingSection(
+                items = trendingMaterials,
+                downloads = downloads,
+                downloadingFileId = downloadingFileId,
+                onMaterialClick = onMaterialClick
+            )
         }
     }
 }
@@ -483,6 +495,8 @@ fun QuoteCard(quote: String) {
 @Composable
 fun LatestMaterialsTray(
     items: List<StudyMaterial>,
+    downloads: List<com.example.data.local.DownloadEntity>,
+    downloadingFileId: String?,
     onMaterialClick: (StudyMaterial) -> Unit
 ) {
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
@@ -496,7 +510,8 @@ fun LatestMaterialsTray(
             Text(
                 "Latest Materials",
                 fontSize = 16.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 "Recent Added",
@@ -521,13 +536,18 @@ fun LatestMaterialsTray(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(items) { material ->
+                    val isDownloaded = downloads.any { it.fileId == material.fileId }
+                    val isDownloading = downloadingFileId == material.fileId
+
                     ElevatedCard(
                         modifier = Modifier
-                            .width(165.dp)
-                            .height(160.dp)
+                            .width(170.dp)
+                            .height(175.dp)
                             .clickable { onMaterialClick(material) },
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.elevatedCardColors(
+                            containerColor = if (isDownloaded) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface
+                        ),
                         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
@@ -542,33 +562,51 @@ fun LatestMaterialsTray(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    // High-fidelity PDF badge
                                     Box(
                                         modifier = Modifier
                                             .background(
-                                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                                                color = Color(0xFFE57373).copy(alpha = 0.15f),
                                                 shape = RoundedCornerShape(6.dp)
                                             )
                                             .padding(horizontal = 6.dp, vertical = 2.dp)
                                     ) {
                                         Text(
-                                            text = material.inferMaterialTypeString(),
+                                            text = "PDF",
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.ExtraBold,
-                                            color = MaterialTheme.colorScheme.primary
+                                            color = Color(0xFFD32F2F)
                                         )
                                     }
-                                    Icon(
-                                        imageVector = Icons.Default.InsertDriveFile,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
-                                        modifier = Modifier.size(14.dp)
-                                    )
+
+                                    // Local download indicator
+                                    if (isDownloading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(14.dp),
+                                            strokeWidth = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    } else if (isDownloaded) {
+                                        Icon(
+                                            imageVector = Icons.Default.OfflinePin,
+                                            contentDescription = "Downloaded Offline",
+                                            tint = Color(0xFF2E7D32),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.CloudDownload,
+                                            contentDescription = "Cloud File",
+                                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                    }
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = material.fileName,
                                     fontSize = 11.sp,
-                                    fontWeight = FontWeight.Black,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     lineHeight = 15.sp,
                                     maxLines = 3,
@@ -576,32 +614,26 @@ fun LatestMaterialsTray(
                                 )
                             }
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.Folder,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                                        modifier = Modifier.size(9.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(2.dp))
+                            Column {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Text(
                                         text = "${material.fileSize} MB",
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    )
+                                    Text(
+                                        text = if (isDownloaded) "Open PDF" else "1-Tap Download",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (isDownloaded) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary
                                     )
                                 }
-                                Text(
-                                    text = material.dateString,
-                                    fontSize = 9.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                )
                             }
                         }
                     }
@@ -614,6 +646,8 @@ fun LatestMaterialsTray(
 @Composable
 fun TrendingSection(
     items: List<StudyMaterial>,
+    downloads: List<com.example.data.local.DownloadEntity>,
+    downloadingFileId: String?,
     onMaterialClick: (StudyMaterial) -> Unit
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
@@ -627,7 +661,8 @@ fun TrendingSection(
             Text(
                 "Trending Downloads",
                 fontSize = 16.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onBackground
             )
             Icon(Icons.Default.TrendingUp, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         }
@@ -647,6 +682,9 @@ fun TrendingSection(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items.take(5).forEachIndexed { index, material ->
+                    val isDownloaded = downloads.any { it.fileId == material.fileId }
+                    val isDownloading = downloadingFileId == material.fileId
+
                     val rankBg = when (index) {
                         0 -> Color(0xFFFFD700).copy(alpha = 0.15f) // Gold
                         1 -> Color(0xFFC0C0C0).copy(alpha = 0.2f)  // Silver
@@ -666,7 +704,7 @@ fun TrendingSection(
                             .clickable { onMaterialClick(material) },
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.elevatedCardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
+                            containerColor = if (isDownloaded) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface
                         ),
                         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
                     ) {
@@ -686,7 +724,7 @@ fun TrendingSection(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
+                                  Text(
                                     text = "${index + 1}",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
@@ -705,6 +743,23 @@ fun TrendingSection(
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
+                                    // High-fidelity small PDF format badge
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                color = Color(0xFFE57373).copy(alpha = 0.12f),
+                                                shape = RoundedCornerShape(4.dp)
+                                            )
+                                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "PDF",
+                                            fontSize = 8.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(0xFFD32F2F)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = material.inferCategoryString(),
                                         fontSize = 10.sp,
@@ -721,12 +776,34 @@ fun TrendingSection(
                                 }
                             }
 
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.size(16.dp)
-                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            IconButton(
+                                onClick = { onMaterialClick(material) },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                if (isDownloading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                } else if (isDownloaded) {
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = "Downloaded Offline",
+                                        tint = Color(0xFF2E7D32),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Download,
+                                        contentDescription = "One-tap download",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }

@@ -54,6 +54,22 @@ class StudyRepository(
         }
     }
 
+    suspend fun fetchRawText(url: String): String {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.getRawText(url)
+                if (response.isSuccessful) {
+                    response.body()?.string() ?: ""
+                } else {
+                    ""
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("StudyRepository", "Error fetching manual/docs of GitHub: ${e.message}")
+                ""
+            }
+        }
+    }
+
     // Downloads Room Queries
     val allDownloads: Flow<List<DownloadEntity>> = downloadDao.getAllDownloads()
 
