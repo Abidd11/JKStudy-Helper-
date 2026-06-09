@@ -25,6 +25,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import com.example.R
 import com.example.ui.viewmodel.StudyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -217,24 +222,19 @@ fun SettingsScreen(
                     ListItem(
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         leadingContent = {
-                            Box(
+                            Image(
+                                painter = painterResource(id = R.drawable.img_developer_avatar),
+                                contentDescription = "Aabid's avatar portrait",
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), shape = CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Code,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+                                    .size(64.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
                         },
                         headlineContent = {
                             Text(
-                                text = "Rather Abid",
-                                fontSize = 14.sp,
+                                text = "Aabid",
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -243,16 +243,17 @@ fun SettingsScreen(
                             Column {
                                 Text(
                                     text = "Lead Developer",
-                                    fontSize = 10.sp,
+                                    fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.SemiBold
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "Developed with ❤️ in Jammu & Kashmir for Board & Competitive Students.",
-                                    fontSize = 11.sp,
+                                    text = "Hey there,\nI’m Aabid, from the heart of Kashmir.\nWith whatever little knowledge I have, I always strive to create something new — something that can make a difference.\nMy true joy lies in using my ideas to serve the people around me.\nThank you for being here 💞\nWith warmth,\nAabid",
+                                    fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    lineHeight = 15.sp
+                                    lineHeight = 16.sp,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }

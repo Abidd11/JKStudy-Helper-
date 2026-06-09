@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         if (currentRoute != ROUTE_HOME) {
                                             navController.navigate(ROUTE_HOME) {
-                                                popUpTo(navController.graph.startDestinationId) {
+                                                popUpTo(ROUTE_HOME) {
                                                     saveState = true
                                                 }
                                                 launchSingleTop = true
@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         if (currentRoute != ROUTE_SEARCH) {
                                             navController.navigate(ROUTE_SEARCH) {
-                                                popUpTo(navController.graph.startDestinationId) {
+                                                popUpTo(ROUTE_HOME) {
                                                     saveState = true
                                                 }
                                                 launchSingleTop = true
@@ -163,7 +163,7 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         if (currentRoute != ROUTE_ALL_MATERIALS) {
                                             navController.navigate(ROUTE_ALL_MATERIALS) {
-                                                popUpTo(navController.graph.startDestinationId) {
+                                                popUpTo(ROUTE_HOME) {
                                                     saveState = true
                                                 }
                                                 launchSingleTop = true
@@ -193,7 +193,7 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         if (currentRoute != ROUTE_MY_DOWNLOADS) {
                                             navController.navigate(ROUTE_MY_DOWNLOADS) {
-                                                popUpTo(navController.graph.startDestinationId) {
+                                                popUpTo(ROUTE_HOME) {
                                                     saveState = true
                                                 }
                                                 launchSingleTop = true
@@ -223,7 +223,7 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         if (currentRoute != ROUTE_SETTINGS) {
                                             navController.navigate(ROUTE_SETTINGS) {
-                                                popUpTo(navController.graph.startDestinationId) {
+                                                popUpTo(ROUTE_HOME) {
                                                     saveState = true
                                                 }
                                                 launchSingleTop = true
@@ -510,7 +510,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onMyDownloadsClick = {
                                     navController.navigate(ROUTE_MY_DOWNLOADS) {
-                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                        popUpTo(ROUTE_HOME) { saveState = true }
                                         launchSingleTop = true
                                         restoreState = true
                                     }
